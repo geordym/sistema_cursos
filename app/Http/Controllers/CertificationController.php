@@ -115,15 +115,17 @@ class CertificationController extends Controller
                 $courseCertificate->certify_code = $certifyCode;
                 $courseCertificate->update();
 
+
                 // Generar el PDF de la certificación
                 $imagePath = $this->imageController->generateCertifyPDF(
-                    $course->course_template,
+                    $course->template,
                     $courseCertificate->certify_code,
                     $courseCertificate->student_fullname,
                     $courseCertificate->issue_date->format('d/m/Y'),
                     $courseCertificate->course_name
                 );
 
+                dd("Unable to decode ");
                 // Convertir la imagen a PDF y guardar en almacenamiento
                 $certifyPdfTempPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('imagen_', true) . '.pdf';
                 $this->imageToPdf($imagePath, $certifyPdfTempPath);
