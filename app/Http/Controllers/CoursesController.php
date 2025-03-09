@@ -21,6 +21,41 @@ class CoursesController extends Controller
         return view('collaborators.courses.index')->with('courses', $courses);
     }
 
+    public function indexAdmin()
+    {
+        $courses = Course::orderBy('created_at', 'DESC')->get();
+        
+        return view('admin.courses.index')->with('courses', $courses);
+    }
+
+    public function editCertifyTemplate($courseId)
+    {
+        $course = Course::where('id', $courseId)->first();
+        return view('admin.courses.edit_template')->with('course', $course);
+    }
+
+    public function storeCertifyTemplate(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'image' => 'required|file|image|max:1024', 
+            'course_id' => 'required|integer|min:1',
+        ]);
+        
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+    
+        $filePath = $request->file('image')->store('images'); 
+
+        $course = Course::find($request->input('course_id'));
+        $course->course_template = $filePath;
+        $course->save();
+
+        return $filePath;
+    }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -64,6 +99,11 @@ class CoursesController extends Controller
         //
     }
 
+
+    public function showCertifyTest($courseId)
+    {
+        
+    }
     /**
      * Show the form for editing the specified resource.
      */

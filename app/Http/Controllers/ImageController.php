@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Label\Label;
 use Illuminate\Http\Request;
 
 use Intervention\Image\Laravel\Facades\Image;
+use FPDF;
 
 
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
+use Illuminate\Support\Facades\Date;
 
 class ImageController extends Controller
 {
@@ -39,53 +42,58 @@ class ImageController extends Controller
     }
 
 
-    public function generateCertifyPDF($code, $alumnName, $finishCourseDate, $courseName)
+    public function generateCertifyPDF($template, $code, $alumnName, $finishCourseDate, $courseName)
     {
-        $certificadoImagePath = 'C:\laragon\www\ep_sistema3\storage\EP sistema\certificado_template_oficial2.jpg';
-        $image = Image::read($certificadoImagePath);
+
+        $absolutePath = storage_path('app/' . $template->template_image_path);
+        $image = Image::read($absolutePath);
 
         $qrPathImage = $this->generateQRCode($code);
 
-        // Cargar la imagen del código QR
         $qrImage = Image::read($qrPathImage);
 
-        $qrX = 780; // Posición X
-        $qrY = 150; // Posición Y
+        $qrX = $template->qr_x;
+        $qrY = $template->qr_y; 
 
-        // Insertar e código QR en la imagen principal
+        $alumnX = $template->alumn_name_x;
+        $alumnY = $template->alumn_name_y;
+
+        $finishCourseDateX = $template->alumn_finishCourseDate_x;
+        $finishCourseDateY = $template->alumn_finishCourseDate_y;
+
+        $courseNameX = $template->alumn_courseName_x;
+        $courseNameY = $template->alumn_courseName_y;
+
+
         $image->place($qrImage, 'top-left', $qrX, $qrY);
 
-        // Agregar texto a la imagen
-        $image->text($alumnName, 500, 330, function ($font) {
-            $font->file('C:\Windows\Fonts\times.ttf');
+        $image->text($alumnName, $alumnX, $alumnY, function ($font) {
+            $font->file(storage_path('EP sistema/times.ttf'));
             $font->size(35);
-            $font->color('#1C1B17'); // Color del texto
+            $font->color('#1C1B17');
             $font->align('center');
             $font->valign('top');
         });
 
-        $image->text($finishCourseDate, 500, 390, function ($font) {
-            $font->file('C:\Windows\Fonts\times.ttf');
+        $image->text($finishCourseDate, $finishCourseDateX, $finishCourseDateY, function ($font) {
+            $font->file(storage_path('EP sistema/times.ttf'));
             $font->size(30);
-            $font->color('#1C1B17'); // Color del texto
+            $font->color('#1C1B17');
             $font->align('center');
             $font->valign('top');
         });
 
-        $image->text($courseName, 490, 515, function ($font) {
-            $font->file('C:\Windows\Fonts\times.ttf');
+        $image->text($courseName, $courseNameX, $courseNameY, function ($font) {
+            $font->file(storage_path('EP sistema/times.ttf'));
             $font->size(34);
-            $font->color('#1C1B17'); // Color del texto
+            $font->color('#1C1B17');
             $font->align('center');
             $font->valign('top');
         });
 
-        // Guardar la imagen editada en un directorio temporal
         $tmpPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('imagen_', true) . '.png';
         $image->save($tmpPath);
 
-        // Retornar la imagen como respuesta HTTP y eliminar el archivo temporal después de enviarlo
-        // return response()->file($tmpPath)->deleteFileAfterSend(true);
         return $tmpPath;
     }
 
@@ -116,5 +124,66 @@ class ImageController extends Controller
 
         // Retornar la ruta del archivo generado
         return $qrCodePath;
+    }
+
+
+
+    public function viewExampleCertify($courseId)
+    {
+        $course = Course::find($courseId);
+
+        $certifyCode = $this->generateCertifyCode(
+            $course->name,
+            $course->hour_load,
+            1,
+            1,
+            1,
+            "2024-11-23"
+        );
+
+        $imagePath = $this->generateCertifyPDF(
+            $course->course_template,
+            $certifyCode,
+            "LUISA VALERIA GONZALEZ JIMENEZ",
+            "2024-11-23",
+            "Curso en manipulacion y operacion de imagenes"
+        );
+
+
+        return response()->file($imagePath, [
+            'Content-Type' => 'image',
+            'Content-Disposition' => 'inline; filename="certificado.png"'
+        ]);
+    }
+
+    public function generateCertifyCode($courseName, $courseHourLoad, $collaboratorId, $alumnId, $certifyId, $certifyAt)
+    {
+        // Extraer las primeras tres letras del nombre del curso y hacerlas mayúsculas
+        $courseCode = strtoupper(substr($courseName, 0, 3));
+
+        // Formatear la fecha de certificación para usarla en el código (ejemplo: YYYYMMDD)
+        $dateCode = date('md', strtotime($certifyAt));
+
+        // Combinar los datos en un formato único
+        $certifyCode = $courseCode . '' . $collaboratorId . '' . $alumnId . '' . $certifyId . '' . $dateCode;
+
+        return $certifyCode;
+    }
+
+    function imageToPdf($imagePath, $pdfPath)
+    {
+        // Crear una instancia de FPDF con orientación horizontal ('L')
+        $pdf = new FPDF('L', 'mm', 'A4');
+        $pdf->AddPage();
+
+        // Dimensiones de la página A4 en orientación horizontal (A4 landscape)
+        $pageWidth = 297; // Ancho de A4 en landscape
+        $pageHeight = 210; // Alto de A4 en landscape
+
+        // Insertar la imagen en el PDF para que ocupe toda la página
+        $pdf->Image($imagePath, 0, 0, $pageWidth, $pageHeight);
+
+        // Guardar el PDF en la ruta especificada
+        $pdf->Output('F', $pdfPath);
     }
 }

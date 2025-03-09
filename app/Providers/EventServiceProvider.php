@@ -63,6 +63,15 @@ class EventServiceProvider extends ServiceProvider
                     ],
 
                 );
+
+                $event->menu->add(
+                    [
+                        'text' => 'Templates',
+                        'url'  => '/admin/templates',
+                    ],
+
+                );
+
                 
             }
 

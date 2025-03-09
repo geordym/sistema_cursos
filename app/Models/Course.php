@@ -14,4 +14,14 @@ class Course extends Model
         'hour_load',
         'collaborator_id', // Asegúrate de incluir este campo
     ];
+
+    public function collaborator()
+    {
+        return $this->belongsTo(Collaborator::class, 'collaborator_id');
+    }
+
+    public function template()
+    {
+        return $this->belongsTo(Template::class, 'template_id');
+    }
 }

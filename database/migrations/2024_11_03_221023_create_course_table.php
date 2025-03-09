@@ -13,13 +13,16 @@ return new class extends Migration
     {
         Schema::create('courses', function (Blueprint $table) {
             $table->id(); 
-            $table->unsignedBigInteger('collaborator_id'); 
-            $table->string('name'); 
-            $table->integer('hour_load'); 
+            $table->unsignedBigInteger('collaborator_id'); // Correctamente definido
+            $table->unsignedBigInteger('template_id')->nullable(); // Cambiado de integer a unsignedBigInteger
+            $table->string('name');
+            $table->integer('hour_load');
             $table->timestamps();
         
+            $table->foreign('template_id')->references('id')->on('templates')->onDelete('cascade');
             $table->foreign('collaborator_id')->references('id')->on('collaborators')->onDelete('cascade');
         });
+        
 
     }
 

@@ -40,6 +40,21 @@ Route::group(['middleware' => ['auth', 'admin']], function () {
 
     Route::get('/admin/tokens', [App\Http\Controllers\TokenController::class, 'index'])->name('admin.tokens');
     Route::post('/admin/tokens/add', [App\Http\Controllers\TokenController::class, 'add'])->name('admin.tokens.add');
+
+    Route::get('/admin/cursos', [App\Http\Controllers\CoursesController::class, 'indexAdmin'])->name('admin.courses');
+    Route::get('/admin/cursos/template-edit/{id}', [App\Http\Controllers\CoursesController::class, 'editCertifyTemplate'])->name('admin.courses.edit_template');
+    Route::post('/admin/cursos/template-edit', [App\Http\Controllers\CoursesController::class, 'storeCertifyTemplate'])->name('admin.courses.storeCertifyTemplate');
+    Route::get('/admin/cursos/template-view/{courseId}', [App\Http\Controllers\ImageController::class, 'viewExampleCertify'])->name('admin.courses.preview_template');
+
+    Route::get('/admin/templates', [App\Http\Controllers\TemplateController::class, 'index'])->name('admin.templates.index');
+    Route::get('/admin/templates/create', [App\Http\Controllers\TemplateController::class, 'create'])->name('admin.templates.create');
+    Route::post('/admin/templates/create', [App\Http\Controllers\TemplateController::class, 'store'])->name('admin.templates.store');
+    Route::get('/admin/templates/edit/{templateId}', [App\Http\Controllers\TemplateController::class, 'edit'])->name('admin.templates.edit');
+    Route::put('/admin/templates/update', [App\Http\Controllers\TemplateController::class, 'update'])->name('admin.templates.update');
+    Route::get('/admin/templates/preview/{templateId}', [App\Http\Controllers\TemplateController::class, 'previewTemplate'])->name('admin.templates.preview');
+    Route::get('/admin/templates/assign-course', [App\Http\Controllers\TemplateController::class, 'assignToCourse'])->name('admin.templates.course.assign');
+    Route::post('/admin/templates/assign-course', [App\Http\Controllers\TemplateController::class, 'assignToCourseUpdate'])->name('admin.templates.assign');
+
 });
 
 Route::group(['middleware' => ['auth']], function () {

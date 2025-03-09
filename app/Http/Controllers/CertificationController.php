@@ -117,6 +117,7 @@ class CertificationController extends Controller
 
                 // Generar el PDF de la certificación
                 $imagePath = $this->imageController->generateCertifyPDF(
+                    $course->course_template,
                     $courseCertificate->certify_code,
                     $courseCertificate->student_fullname,
                     $courseCertificate->issue_date->format('d/m/Y'),
