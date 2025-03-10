@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Template;
 use Illuminate\Http\Request;
+use FPDF;
 
 class TemplateController extends Controller
 {
@@ -98,7 +99,10 @@ class TemplateController extends Controller
             'course_name_text_size' => 'nullable|numeric', // Tamaño del texto Nombre Curso
             'course_name_text_color' => 'nullable|string|max:7', // Color del texto Nombre Curso
             'course_name_text_align' => 'nullable|string|max:20', // Alineación del texto Nombre Curso
-            'qr_size' => 'nullable|numeric'
+            'qr_size' => 'nullable|numeric',
+            'page_orientation' => 'nullable|string|max:20',
+            'page_width' => 'nullable|numeric',
+            'page_height' => 'nullable|numeric'
         ]);
 
         try {
@@ -133,6 +137,9 @@ class TemplateController extends Controller
             $template->course_name_text_color = $request->input('course_name_text_color');
             $template->course_name_text_align = $request->input('course_name_text_align');
             $template->qr_size = $request->input('qr_size');
+            $template->page_orientation = $request->input('page_orientation');
+            $template->page_width = $request->input('page_width');
+            $template->page_height = $request->input('page_height');
 
             $template->save();
 
@@ -169,15 +176,39 @@ class TemplateController extends Controller
         $imagePath = $this->imageController->generateCertifyPDF(
             $template,
             $certifyCode,
+            $certifyCode,
             "LUISA VALERIA GONZALEZ JIMENEZ",
             "2024-11-23",
             "Curso de ejemplo para previsualizacion"
         );
 
-        return response()->file($imagePath, [
-            'Content-Type' => 'image',
-            'Content-Disposition' => 'inline; filename="certificado.png"'
+
+        $tempPdfPath = tempnam(sys_get_temp_dir(), 'pdf_') . '.pdf';
+        $imageInPdf = $this->imageToPdf($imagePath, $tempPdfPath, $template);
+
+        return response()->file($tempPdfPath, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="certificado.pdf"',
         ]);
+    }
+
+    function imageToPdf($imagePath, $pdfPath, $template)
+    {
+
+        $orientation = $template->page_orientation ?? "L";
+        // Crear una instancia de FPDF con orientación horizontal ('L')
+        $pdf = new FPDF($orientation, 'mm', 'A4');
+        $pdf->AddPage();
+
+        // Dimensiones de la página A4 en orientación horizontal (A4 landscape)
+        $pageWidth = $template->page_width ?? 297;
+        $pageHeight = $template->page_height ?? 210;
+
+        // Insertar la imagen en el PDF para que ocupe toda la página
+        $pdf->Image($imagePath, 0, 0, $pageWidth, $pageHeight);
+
+        // Guardar el PDF en la ruta especificada
+        $pdf->Output('F', $pdfPath);
     }
 
     public function generateCertifyCode($courseName, $courseHourLoad, $collaboratorId, $alumnId, $certifyId, $certifyAt)
@@ -231,6 +262,9 @@ class TemplateController extends Controller
                 'course_name_text_color' => 'nullable|string|max:7', // Color del texto Nombre Curso
                 'course_name_text_align' => 'nullable|string|max:20', // Alineación del texto Nombre Curso
                 'qr_size' => 'nullable|numeric', // Tamaño del texto Nombre Alumno
+                'page_orientation' => 'nullable|string|max:20',
+                'page_width' => 'nullable|numeric',
+                'page_height' => 'nullable|numeric'
             ]);
 
             $id = $request->input('template_id');
@@ -268,6 +302,10 @@ class TemplateController extends Controller
             $template->course_name_text_color = $validatedData['course_name_text_color'];
             $template->course_name_text_align = $validatedData['course_name_text_align'];
             $template->qr_size = $validatedData['qr_size'];
+            $template->page_orientation = $validatedData['page_orientation'];
+            $template->page_width = $request->input('page_width');
+            $template->page_height = $request->input('page_height');
+
 
             // Guardar los cambios
             $template->save();

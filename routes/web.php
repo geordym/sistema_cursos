@@ -23,7 +23,7 @@ Route::get('/', function () {
 });
 
 Route::get('/certificate/search', [CertificationController::class, 'showSearchForm'])->name('certificate.searchForm');
-Route::post('/certificate/search', [CertificationController::class, 'search'])->name('certificate.search');
+Route::get('/certificate/search/by-code', [CertificationController::class, 'search'])->name('certificate.search');
 
 
 // Rutas de autenticación personalizadas

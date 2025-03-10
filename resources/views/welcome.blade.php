@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,6 +9,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-light">
 
     <nav class="navbar navbar-expand-lg navbar-light bg-primary">
@@ -21,20 +23,21 @@
 
                 <!-- Error Message -->
                 @if(session('error'))
-                    <div class="alert alert-danger" role="alert">
-                        {{ session('error') }}
-                    </div>
+                <div class="alert alert-danger" role="alert">
+                    {{ session('error') }}
+                </div>
                 @endif
 
                 <!-- Search Form -->
-                <form action="{{ route('certificate.search') }}" method="POST">
-                    @csrf
+                <!-- Search Form -->
+                <form action="{{ route('certificate.search') }}" method="GET">
                     <div class="form-group">
                         <label for="certificate_code">Ingresa el código del certificado:</label>
-                        <input type="text" id="certificate_code" name="certificate_code" class="form-control" required>
+                        <input type="text" id="certificate_code" name="code" class="form-control" required>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block">Buscar</button>
                 </form>
+
             </div>
         </div>
     </div>
@@ -44,4 +47,5 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+
 </html>

@@ -140,7 +140,27 @@
                             <input type="number" class="form-control" id="qr_size" name="qr_size" value="{{ $template->qr_size }}">
                         </div>
 
-                        
+                        <div class="form-group">
+                            <label for="page_orientation">Orientación de la página:</label>
+                            <select class="form-control" id="page_orientation" name="page_orientation">
+                                <option value="P" {{ $template->page_orientation == 'P' ? 'selected' : '' }}>Vertical (Portrait)</option>
+                                <option value="L" {{ $template->page_orientation == 'L' ? 'selected' : '' }}>Horizontal (Landscape)</option>
+                            </select>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="page_width">Ancho de la página (en mm):</label>
+                            <input type="number" class="form-control" id="page_width" name="page_width" value="{{ $template->page_width }}">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="page_height">Alto de la página (en mm):</label>
+                            <input type="number" class="form-control" id="page_height" name="page_height" value="{{ $template->page_height }}">
+                        </div>
+
+
+
                     </div>
                 </div>
 

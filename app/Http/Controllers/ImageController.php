@@ -42,7 +42,7 @@ class ImageController extends Controller
     }
 
 
-    public function generateCertifyPDF($template, $code, $alumnName, $finishCourseDate, $courseName)
+    public function generateCertifyPDF($template, $code, $textUnderCode, $alumnName, $finishCourseDate, $courseName)
     {
 
         $absolutePath = storage_path('app/' . $template->template_image_path);
@@ -50,7 +50,7 @@ class ImageController extends Controller
 
 
         $QR_SIZE = $template->qr_size ?? 150;
-        $qrPathImage = $this->generateQRCode($code, $QR_SIZE);
+        $qrPathImage = $this->generateQRCode($code, $textUnderCode, $QR_SIZE);
 
         $qrImage = Image::read($qrPathImage);
 
@@ -121,7 +121,7 @@ class ImageController extends Controller
     }
 
 
-    public function generateQRCode($codeText, $qrSize)
+    public function generateQRCode($codeText, $textUnderCode, $qrSize)
     {
         // Crear el objeto QrCode con el texto proporcionado
         $qrCode = new QrCode($codeText);
@@ -133,7 +133,7 @@ class ImageController extends Controller
         $writer = new PngWriter();
 
         $label = new Label(
-            text: $codeText,  // El texto que quieres agregar debajo del QR
+            text: $textUnderCode,  // El texto que quieres agregar debajo del QR
             textColor: new Color(0, 0, 255)
         );
 
@@ -167,6 +167,7 @@ class ImageController extends Controller
         $imagePath = $this->generateCertifyPDF(
             $course->course_template,
             $certifyCode,
+            $certifyCode,
             "LUISA VALERIA GONZALEZ JIMENEZ",
             "2024-11-23",
             "Curso en manipulacion y operacion de imagenes"
@@ -193,10 +194,12 @@ class ImageController extends Controller
         return $certifyCode;
     }
 
-    function imageToPdf($imagePath, $pdfPath)
+    function imageToPdf($imagePath, $pdfPath, $template)
     {
+
+        $orientation = $template->orientation ?? "L";
         // Crear una instancia de FPDF con orientación horizontal ('L')
-        $pdf = new FPDF('L', 'mm', 'A4');
+        $pdf = new FPDF($orientation, 'mm', 'A4');
         $pdf->AddPage();
 
         // Dimensiones de la página A4 en orientación horizontal (A4 landscape)

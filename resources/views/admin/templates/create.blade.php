@@ -139,10 +139,32 @@
                     <input type="text" class="form-control" id="course_name_text_align" name="course_name_text_align">
                 </div>
 
+                <div class="form-group">
+                    <label for="page_orientation">Orientación de la página:</label>
+                    <select class="form-control" id="page_orientation" name="page_orientation">
+                        <option value="P">Vertical (Portrait)</option>
+                        <option value="L">Horizontal (Landscape)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="page_width">Ancho de la página (en mm):</label>
+                    <input type="number" class="form-control" id="page_width" name="page_width" >
+                </div>
+
+                <div class="form-group">
+                    <label for="page_height">Alto de la página (en mm):</label>
+                    <input type="number" class="form-control" id="page_height" name="page_height" >
+                </div>
+
+
+
                 <div class="modal-footer">
                     <a type="button" class="btn btn-secondary" href="{{ route('admin.templates.index') }}">Cancelar</a>
                     <button type="submit" class="btn btn-primary">Registrar Template</button>
                 </div>
+
+
             </form>
 
 

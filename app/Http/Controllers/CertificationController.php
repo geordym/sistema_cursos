@@ -117,8 +117,11 @@ class CertificationController extends Controller
 
 
                 // Generar el PDF de la certificación
+
+                
                 $imagePath = $this->imageController->generateCertifyPDF(
                     $course->template,
+                    $this->generateCertifyQRCode($courseCertificate->certify_code),
                     $courseCertificate->certify_code,
                     $courseCertificate->student_fullname,
                     $courseCertificate->issue_date->format('d/m/Y'),
@@ -127,7 +130,7 @@ class CertificationController extends Controller
 
                 // Convertir la imagen a PDF y guardar en almacenamiento
                 $certifyPdfTempPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('imagen_', true) . '.pdf';
-                $this->imageToPdf($imagePath, $certifyPdfTempPath);
+                $this->imageToPdf($imagePath, $certifyPdfTempPath, $course->template);
                 $pdfContent = file_get_contents($certifyPdfTempPath);
                 $storagePath = 'images/' . basename($certifyPdfTempPath);
                 Storage::disk('public')->put($storagePath, $pdfContent);
@@ -169,6 +172,10 @@ class CertificationController extends Controller
         }
 
         return view('collaborators.certifications.show')->with('certifications', $certifications);
+    }
+    
+    public function generateCertifyQRCode($certifyCode){
+        return "https://cursos.aiet.education/certificate/search/by-code?code=" . $certifyCode;
     }
 
     public function haveEnoughTokens(int $quantityCertifications): bool
@@ -258,14 +265,10 @@ class CertificationController extends Controller
 
     public function search(Request $request)
     {
-        $request->validate([
-            'certificate_code' => 'required|string',
-        ]);
-
-        $certificateCode = $request->input('certificate_code');
+        $code = $request->query('code'); 
 
         // Busca el certificado en la base de datos
-        $certificate = CourseCertificate::where('certify_code', $certificateCode)->first();
+        $certificate = CourseCertificate::where('certify_code', $code)->first();
 
         if ($certificate) {
             return view('certificate_result', compact('certificate'));
