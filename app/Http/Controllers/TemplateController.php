@@ -11,7 +11,8 @@ class TemplateController extends Controller
 
     private $imageController;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->imageController = new ImageController();
     }
 
@@ -25,10 +26,11 @@ class TemplateController extends Controller
         return view('admin.templates.index')->with('templates', $templates)->with('courses', $courses);
     }
 
-    public function assignToCourse(){
+    public function assignToCourse()
+    {
         $courses = Course::all();
         $templates = Template::all();
-        return view ('admin.templates.course_assign')->with('courses', $courses)->with('templates', $templates);
+        return view('admin.templates.course_assign')->with('courses', $courses)->with('templates', $templates);
     }
 
     public function assignToCourseUpdate(Request $request)
@@ -38,15 +40,15 @@ class TemplateController extends Controller
             'course_id' => 'required|exists:courses,id', // Verifica que el curso exista
             'template_id' => 'required|exists:templates,id', // Verifica que el template exista
         ]);
-    
+
         try {
             // Buscar el curso por su ID
             $course = Course::findOrFail($validatedData['course_id']);
-    
+
             // Actualizar el campo template_id
             $course->template_id = $validatedData['template_id'];
             $course->save();
-    
+
             // Redirigir con un mensaje de éxito
             return redirect()
                 ->route('admin.templates.index')
@@ -58,7 +60,7 @@ class TemplateController extends Controller
                 ->with('error', 'Ocurrió un error al asignar el template: ' . $e->getMessage());
         }
     }
-    
+
 
 
     /**
@@ -86,21 +88,31 @@ class TemplateController extends Controller
             'alumn_finishCourseDate_y' => 'required|numeric',
             'alumn_courseName_x' => 'required|numeric',
             'alumn_courseName_y' => 'required|numeric',
+            // Nuevos campos
+            'alumn_name_text_size' => 'nullable|numeric', // Tamaño del texto Nombre Alumno
+            'alumn_name_text_color' => 'nullable|string|max:7', // Color del texto Nombre Alumno
+            'alumn_name_text_align' => 'nullable|string|max:20', // Alineación del texto Nombre Alumno
+            'finish_course_text_size' => 'nullable|numeric', // Tamaño del texto Fecha Finalización
+            'finish_course_text_color' => 'nullable|string|max:7', // Color del texto Fecha Finalización
+            'finish_course_text_align' => 'nullable|string|max:20', // Alineación del texto Fecha Finalización
+            'course_name_text_size' => 'nullable|numeric', // Tamaño del texto Nombre Curso
+            'course_name_text_color' => 'nullable|string|max:7', // Color del texto Nombre Curso
+            'course_name_text_align' => 'nullable|string|max:20', // Alineación del texto Nombre Curso
+            'qr_size' => 'nullable|numeric'
         ]);
-    
+
         try {
             // Almacenamiento de la imagen
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
-
-                $imagePath = $request->file('image')->store('images'); 
+                $imagePath = $request->file('image')->store('images');
             }
-    
+
             // Creación del template
             $template = new Template();
             $template->name = $request->input('name');
-            $template->template_image_path = $imagePath ?? ''; 
+            $template->template_image_path = $imagePath ?? '';
             $template->qr_x = $request->input('qr_x');
             $template->qr_y = $request->input('qr_y');
             $template->alumn_name_x = $request->input('alumn_name_x');
@@ -109,17 +121,30 @@ class TemplateController extends Controller
             $template->alumn_finishCourseDate_y = $request->input('alumn_finishCourseDate_y');
             $template->alumn_courseName_x = $request->input('alumn_courseName_x');
             $template->alumn_courseName_y = $request->input('alumn_courseName_y');
+
+            // Nuevos campos
+            $template->alumn_name_text_size = $request->input('alumn_name_text_size');
+            $template->alumn_name_text_color = $request->input('alumn_name_text_color');
+            $template->alumn_name_text_align = $request->input('alumn_name_text_align');
+            $template->finish_course_text_size = $request->input('finish_course_text_size');
+            $template->finish_course_text_color = $request->input('finish_course_text_color');
+            $template->finish_course_text_align = $request->input('finish_course_text_align');
+            $template->course_name_text_size = $request->input('course_name_text_size');
+            $template->course_name_text_color = $request->input('course_name_text_color');
+            $template->course_name_text_align = $request->input('course_name_text_align');
+            $template->qr_size = $request->input('qr_size');
+
             $template->save();
-    
+
             // Retorno al índice de templates con un mensaje de éxito
             return redirect()->route('admin.templates.index')->with('success', 'Template creado exitosamente.');
-    
         } catch (\Exception $e) {
             // Si ocurre un error, retornamos el mensaje de error
             return back()->withErrors(['error' => 'Hubo un error al crear el template. Por favor, inténtalo de nuevo.'])->withInput();
         }
     }
-    
+
+
     /**
      * Display the specified resource.
      */
@@ -128,9 +153,10 @@ class TemplateController extends Controller
         //
     }
 
-    public function previewTemplate($templateId){
+    public function previewTemplate($templateId)
+    {
         $template = Template::find($templateId);
-        
+
         $certifyCode = $this->generateCertifyCode(
             "Example",
             10,
@@ -194,22 +220,32 @@ class TemplateController extends Controller
                 'alumn_finishCourseDate_y' => 'required|numeric',
                 'alumn_courseName_x' => 'required|numeric',
                 'alumn_courseName_y' => 'required|numeric',
+                // Nuevos campos
+                'alumn_name_text_size' => 'nullable|numeric', // Tamaño del texto Nombre Alumno
+                'alumn_name_text_color' => 'nullable|string|max:7', // Color del texto Nombre Alumno
+                'alumn_name_text_align' => 'nullable|string|max:20', // Alineación del texto Nombre Alumno
+                'finish_course_text_size' => 'nullable|numeric', // Tamaño del texto Fecha Finalización
+                'finish_course_text_color' => 'nullable|string|max:7', // Color del texto Fecha Finalización
+                'finish_course_text_align' => 'nullable|string|max:20', // Alineación del texto Fecha Finalización
+                'course_name_text_size' => 'nullable|numeric', // Tamaño del texto Nombre Curso
+                'course_name_text_color' => 'nullable|string|max:7', // Color del texto Nombre Curso
+                'course_name_text_align' => 'nullable|string|max:20', // Alineación del texto Nombre Curso
+                'qr_size' => 'nullable|numeric', // Tamaño del texto Nombre Alumno
             ]);
-    
+
             $id = $request->input('template_id');
             // Encontrar el template por ID
             $template = Template::findOrFail($id);
-    
+
             // Verificar si se subió una nueva imagen
             if ($request->hasFile('template_image')) {
                 $image = $request->file('template_image');
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
 
                 $imagePath = $request->file('template_image')->store('images');
-                $template->template_image_path = $imagePath; 
+                $template->template_image_path = $imagePath;
             }
-    
-    
+
             // Actualizar los demás campos
             $template->name = $validatedData['name'];
             $template->qr_x = $validatedData['qr_x'];
@@ -220,15 +256,26 @@ class TemplateController extends Controller
             $template->alumn_finishCourseDate_y = $validatedData['alumn_finishCourseDate_y'];
             $template->alumn_courseName_x = $validatedData['alumn_courseName_x'];
             $template->alumn_courseName_y = $validatedData['alumn_courseName_y'];
-    
+
+            // Nuevos campos
+            $template->alumn_name_text_size = $validatedData['alumn_name_text_size'];
+            $template->alumn_name_text_color = $validatedData['alumn_name_text_color'];
+            $template->alumn_name_text_align = $validatedData['alumn_name_text_align'];
+            $template->finish_course_text_size = $validatedData['finish_course_text_size'];
+            $template->finish_course_text_color = $validatedData['finish_course_text_color'];
+            $template->finish_course_text_align = $validatedData['finish_course_text_align'];
+            $template->course_name_text_size = $validatedData['course_name_text_size'];
+            $template->course_name_text_color = $validatedData['course_name_text_color'];
+            $template->course_name_text_align = $validatedData['course_name_text_align'];
+            $template->qr_size = $validatedData['qr_size'];
+
             // Guardar los cambios
             $template->save();
-    
+
             // Redirigir con mensaje de éxito
             return redirect()
                 ->route('admin.templates.edit', $id)
                 ->with('success', 'Template actualizado correctamente.');
-    
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Retornar errores de validación
             return redirect()
@@ -242,7 +289,8 @@ class TemplateController extends Controller
                 ->with('error', 'Ocurrió un error al actualizar el template: ' . $e->getMessage());
         }
     }
-    
+
+
 
     /**
      * Remove the specified resource from storage.

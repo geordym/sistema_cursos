@@ -48,12 +48,14 @@ class ImageController extends Controller
         $absolutePath = storage_path('app/' . $template->template_image_path);
         $image = Image::read($absolutePath);
 
-        $qrPathImage = $this->generateQRCode($code);
+
+        $QR_SIZE = $template->qr_size ?? 150;
+        $qrPathImage = $this->generateQRCode($code, $QR_SIZE);
 
         $qrImage = Image::read($qrPathImage);
 
         $qrX = $template->qr_x;
-        $qrY = $template->qr_y; 
+        $qrY = $template->qr_y;
 
         $alumnX = $template->alumn_name_x;
         $alumnY = $template->alumn_name_y;
@@ -67,29 +69,50 @@ class ImageController extends Controller
 
         $image->place($qrImage, 'top-left', $qrX, $qrY);
 
-        $image->text($alumnName, $alumnX, $alumnY, function ($font) {
+
+        $image->text($alumnName, $alumnX, $alumnY, function ($font) use ($template) {
+            $ALUMN_NAME_TEXT_SIZE = $template->alumn_name_text_size ?? 35;
+            $ALUMN_NAME_TEXT_COLOR = $template->alumn_name_text_color ?? '#1C1B17';
+            $ALUMN_NAME_TEXT_ALIGN = $template->alumn_name_text_align ?? 'center';
+
+
             $font->file(storage_path('EP sistema/times.ttf'));
-            $font->size(35);
-            $font->color('#1C1B17');
-            $font->align('center');
+            $font->size($ALUMN_NAME_TEXT_SIZE);
+            $font->color($ALUMN_NAME_TEXT_COLOR);
+            $font->align($ALUMN_NAME_TEXT_ALIGN);
             $font->valign('top');
         });
 
-        $image->text($finishCourseDate, $finishCourseDateX, $finishCourseDateY, function ($font) {
+
+
+
+
+        $image->text($finishCourseDate, $finishCourseDateX, $finishCourseDateY, function ($font) use ($template){
+            $FINISH_COURSE_TEXT_SIZE = $template->finish_course_text_size ?? 35;
+            $FINISH_COURSE_TEXT_COLOR = $template->finish_course_text_color ?? '#1C1B17';
+            $FINISH_COURSE_TEXT_ALIGN = $template->finish_course_text_align ?? 'center';
+
+
             $font->file(storage_path('EP sistema/times.ttf'));
-            $font->size(30);
-            $font->color('#1C1B17');
-            $font->align('center');
+            $font->size($FINISH_COURSE_TEXT_SIZE);
+            $font->color($FINISH_COURSE_TEXT_COLOR);
+            $font->align($FINISH_COURSE_TEXT_ALIGN);
             $font->valign('top');
         });
 
-        $image->text($courseName, $courseNameX, $courseNameY, function ($font) {
+
+        $image->text($courseName, $courseNameX, $courseNameY, function ($font) use ($template){
+            $COURSE_NAME_TEXT_SIZE = $template->course_name_text_size ?? 35;
+            $COURSE_NAME_TEXT_COLOR = $template->course_name_text_color ?? '#1C1B17';
+            $COURSE_NAME_TEXT_ALIGN = $template->course_name_text_align ?? 'center';
+
             $font->file(storage_path('EP sistema/times.ttf'));
-            $font->size(34);
-            $font->color('#1C1B17');
-            $font->align('center');
+            $font->size($COURSE_NAME_TEXT_SIZE);
+            $font->color($COURSE_NAME_TEXT_COLOR);
+            $font->align($COURSE_NAME_TEXT_ALIGN);
             $font->valign('top');
         });
+
 
         $tmpPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('imagen_', true) . '.png';
         $image->save($tmpPath);
@@ -98,13 +121,13 @@ class ImageController extends Controller
     }
 
 
-    public function generateQRCode($codeText)
+    public function generateQRCode($codeText, $qrSize)
     {
         // Crear el objeto QrCode con el texto proporcionado
         $qrCode = new QrCode($codeText);
 
         // Ajustar el tamaño del QR (por ejemplo, 150 px en lugar de 300 px)
-        $qrCode->setSize(120); // Cambia el valor según lo que necesites para hacerlo más pequeño
+        $qrCode->setSize($qrSize); // Cambia el valor según lo que necesites para hacerlo más pequeño
 
         // Crear el escritor para guardar la imagen como PNG
         $writer = new PngWriter();
