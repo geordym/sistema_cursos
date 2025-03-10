@@ -101,7 +101,7 @@
 
 </head>
 
-<body class="@yield('classes_body')" @yield('body_data') style="background-color: #13f6a8">
+<body class="@yield('classes_body')" @yield('body_data') style="background-image: url('{{ asset('storage/images2/login-background.jpg') }}');">
 
     {{-- Body Content --}}
     @yield('body')
