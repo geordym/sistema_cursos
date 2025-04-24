@@ -13,36 +13,41 @@
 </head>
 
 <body class="antialiased bg-light">
-    <div class="card">
-        <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center">
-                <img src="{{ asset('storage/resources/aiet-logo.jpg') }}" alt="Logo AIET" style="height: 50px; width: auto;" class="mr-3">
-                <h1 class="h5 mb-0">Resultado de la Búsqueda</h1>
-            </div>
+    <div class="container mt-5">
+        <div class="text-center mb-4">
+            <img src="{{ asset('storage/resources/aiet-logo.jpg') }}" alt="Logo AIET" style="height: 80px;">
         </div>
 
-        <div class="card-body">
-            @if($certificate)
-            <div class="alert alert-success">
-                <strong>Certificado Encontrado</strong>
+        <div class="card shadow-lg border-0">
+            <div class="card-header text-white" style="background: linear-gradient(90deg, #007bff, #0056b3);">
+                <h2 class="h4 mb-0 text-center">Resultado de la Búsqueda</h2>
             </div>
 
-            <p><strong>Código del Certificado:</strong> {{ $certificate->certify_code }}</p>
-            <p><strong>Nombre del Titular:</strong> {{ $certificate->student_fullname }}</p>
-            <p><strong>CURP del Estudiante:</strong> {{ $certificate->student_curp }}</p>
-            <p><strong>Curso:</strong> {{ $certificate->course_name }}</p>
-            <p><strong>Carga Horaria del Curso:</strong> {{ $certificate->course_hour_load }} horas</p>
-            <p><strong>Fecha de Emisión:</strong> {{ $certificate->issue_date }}</p>
-            <p><strong>Instructor:</strong> {{ $certificate->instructor_name }}</p>
-            @else
-            <div class="alert alert-danger">
-                <strong>Certificado no encontrado</strong>
-            </div>
-            @endif
-        </div>
+            <div class="card-body">
+                @if($certificate)
+                    <div class="alert alert-success text-center">
+                        <strong>✅ Certificado Encontrado</strong>
+                    </div>
 
-        <div class="card-footer text-right">
-            <a href="{{ route('certificate.searchForm') }}" class="btn btn-secondary">Buscar otro certificado</a>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Código del Certificado:</strong> {{ $certificate->certify_code }}</li>
+                        <li class="list-group-item"><strong>Nombre del Titular:</strong> {{ $certificate->student_fullname }}</li>
+                        <li class="list-group-item"><strong>CURP del Estudiante:</strong> {{ $certificate->student_curp }}</li>
+                        <li class="list-group-item"><strong>Curso:</strong> {{ $certificate->course_name }}</li>
+                        <li class="list-group-item"><strong>Carga Horaria del Curso:</strong> {{ $certificate->course_hour_load }} horas</li>
+                        <li class="list-group-item"><strong>Fecha de Emisión:</strong> {{ $certificate->issue_date }}</li>
+                        <li class="list-group-item"><strong>Instructor:</strong> {{ $certificate->instructor_name }}</li>
+                    </ul>
+                @else
+                    <div class="alert alert-danger text-center">
+                        <strong>❌ Certificado no encontrado</strong>
+                    </div>
+                @endif
+            </div>
+
+            <div class="card-footer text-center">
+                <a href="{{ route('certificate.searchForm') }}" class="btn btn-outline-primary">🔎 Buscar otro certificado</a>
+            </div>
         </div>
     </div>
 
