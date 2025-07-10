@@ -41,6 +41,10 @@
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createUserModal">
             Asignar Token
         </button>
+
+         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#removeTokenModal">
+            Remover Token
+        </button>
     </div>
     <div class="row bg-white mt-3">
     <div class="container mt-4">
@@ -123,6 +127,50 @@
 </form>
 
 
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="removeTokenModal" tabindex="-1" role="dialog" aria-labelledby="removeTokenModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="removeTokenModalLabel">Remover tokens</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <form action="{{ route('admin.tokens.remove') }}" method="POST">
+                    @csrf
+                    <div class="form-group">
+                        <label for="collaborator_id_remove">Colaborador:</label>
+                        <select class="form-control" id="collaborator_id_remove" name="collaborator_id" required>
+                            <option value="">Selecciona un colaborador</option>
+                            @foreach($collaborators as $collaborator)
+                                <option value="{{ $collaborator->user->id }}">{{ $collaborator->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tokens_remove">Cantidad de Tokens a remover:</label>
+                        <input type="number" class="form-control" id="tokens_remove" name="tokens" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description_remove">Descripción:</label>
+                        <input type="text" class="form-control" id="description_remove" name="description" required>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-danger">Remover Tokens</button>
+                    </div>
+                </form>
 
             </div>
         </div>

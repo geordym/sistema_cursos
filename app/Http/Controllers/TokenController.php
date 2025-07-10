@@ -85,6 +85,52 @@ class TokenController extends Controller
                 ->with('error', 'Error al añadir tokens: ' . $e->getMessage());
         }
     }
+
+    public function remove(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'collaborator_id' => 'required|exists:collaborators,id',
+            'tokens' => 'required|integer|min:1',
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('admin.tokens')
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $collaborator_id = $request->input('collaborator_id');
+        $quantityTokensToRemove = $request->input('tokens');
+        $description = $request->input('description');
+
+        try {
+            DB::transaction(function () use ($collaborator_id, $quantityTokensToRemove, $description) {
+                $collaborator = Collaborator::findOrFail($collaborator_id);
+
+                if ($collaborator->tokens < $quantityTokensToRemove) {
+                    throw new \Exception('El colaborador no tiene suficientes tokens para remover.');
+                }
+
+                TokenLog::create([
+                    'user_id' => $collaborator_id,
+                    'tokens' => -$quantityTokensToRemove, // Guardamos como negativo para dejarlo registrado
+                    'description' => $description,
+                    'type' => 'deduction'
+                ]);
+
+                $collaborator->tokens -= $quantityTokensToRemove;
+                $collaborator->save();
+            });
+
+            return redirect()->route('admin.tokens')
+                ->with('success', 'Tokens removidos correctamente.');
+        } catch (\Exception $e) {
+            return redirect()->route('admin.tokens')
+                ->with('error', 'Error al remover tokens: ' . $e->getMessage());
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      */

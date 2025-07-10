@@ -40,6 +40,7 @@ Route::group(['middleware' => ['auth', 'admin']], function () {
 
     Route::get('/admin/tokens', [App\Http\Controllers\TokenController::class, 'index'])->name('admin.tokens');
     Route::post('/admin/tokens/add', [App\Http\Controllers\TokenController::class, 'add'])->name('admin.tokens.add');
+    Route::post('/admin/tokens/remove', [App\Http\Controllers\TokenController::class, 'remove'])->name('admin.tokens.remove');
 
     Route::get('/admin/cursos', [App\Http\Controllers\CoursesController::class, 'indexAdmin'])->name('admin.courses');
     Route::get('/admin/cursos/template-edit/{id}', [App\Http\Controllers\CoursesController::class, 'editCertifyTemplate'])->name('admin.courses.edit_template');
